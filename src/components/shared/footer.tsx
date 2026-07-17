@@ -3,9 +3,9 @@ import { Logo } from "./logo";
 
 const LINKS = {
   Product: [
-    { label: "How it works", href: "#how-it-works" },
-    { label: "Explore creators", href: "#creators" },
-    { label: "Pricing", href: "#pricing" },
+    { label: "How it works", href: "/how-it-works" },
+    { label: "Explore creators", href: "/creators" },
+    { label: "Success stories", href: "/success-stories" },
   ],
   Company: [
     { label: "About", href: "/about" },

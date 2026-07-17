@@ -2,17 +2,25 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { Logo } from "./logo";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Explore creators", href: "#creators" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Home", href: "/" },
+  { label: "How it works", href: "/how-it-works" },
+  { label: "Explore creators", href: "/creators" },
+  { label: "Success stories", href: "/success-stories" },
 ];
 
+function isActiveRoute(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function Navbar() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -47,16 +55,28 @@ export function Navbar() {
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="group relative cursor-pointer rounded-full px-4 py-2 text-sm font-semibold text-foreground transition-colors duration-150 hover:bg-signature-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
-              >
-                {link.label}
-                <span className="absolute left-1/2 -bottom-2.25 h-1.5 w-1.5 -translate-x-1/2 scale-0 rounded-full bg-signature transition-transform duration-200 group-hover:scale-100" />
-              </a>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const active = isActiveRoute(pathname, link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "group relative cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-150 hover:bg-signature-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature",
+                    active ? "text-signature-dark" : "text-foreground",
+                  )}
+                >
+                  {link.label}
+                  <span
+                    className={cn(
+                      "absolute left-1/2 -bottom-2.25 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-signature transition-transform duration-200",
+                      active ? "scale-100" : "scale-0 group-hover:scale-100",
+                    )}
+                  />
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
@@ -116,16 +136,26 @@ export function Navbar() {
         </div>
 
         <div className="flex flex-col gap-1 p-5">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setOpen(false)}
-              className="cursor-pointer rounded-lg px-3 py-3 text-base font-bold text-foreground transition-colors duration-150 hover:bg-signature-soft"
-            >
-              {link.label}
-            </a>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const active = isActiveRoute(pathname, link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "flex cursor-pointer items-center gap-2 rounded-lg px-3 py-3 text-base font-bold transition-colors duration-150 hover:bg-signature-soft",
+                  active ? "bg-signature-soft text-signature-dark" : "text-foreground",
+                )}
+              >
+                {link.label}
+                {active && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-signature" />
+                )}
+              </Link>
+            );
+          })}
           <div className="mt-4 flex flex-col gap-2 border-t-2 border-ink pt-4">
             <Link
               href="/login"
