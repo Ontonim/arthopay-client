@@ -1,26 +1,107 @@
 @import "tailwindcss";
+@import "../styles/theme.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--signature);
+  color: var(--cream);
+}
+
+/* ---- Hard "sticker" shadow system ---- */
+.shadow-hard-sm {
+  box-shadow: var(--shadow-hard-sm);
+}
+.shadow-hard {
+  box-shadow: var(--shadow-hard);
+}
+.shadow-hard-lg {
+  box-shadow: var(--shadow-hard-lg);
+}
+.shadow-hard-signature {
+  box-shadow: var(--shadow-hard-signature);
+}
+
+/* press-down interaction: shadow "collapses" as the element moves into it */
+.press {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.press:hover {
+  transform: translate(-2px, -2px);
+}
+.press:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 0 var(--ink) !important;
+}
+
+/* ---- Texture: subtle warm dot grid ---- */
+.bg-dot-grid {
+  background-image: radial-gradient(circle, var(--ink) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(var(--tw-rotate, 0deg));
+  }
+  50% {
+    transform: translateY(-10px) rotate(var(--tw-rotate, 0deg));
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-marquee {
+  animation: marquee 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-fade-in-up,
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }

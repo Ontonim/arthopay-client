@@ -1,0 +1,103 @@
+/**
+ * Arthopay design tokens — single source of truth.
+ * One signature color (green), warm cream/ink palette, hard-edge "sticker" style.
+ * Change a value here and it propagates everywhere via Tailwind utilities.
+ */
+
+:root {
+  /* ---- Signature (the ONE brand color) ---- */
+  --signature: #4c8c69;
+  --signature-dark: #396950;
+  --signature-soft: #dcebe1;
+
+  /* ---- Neutrals (tinted from the signature green, not warm cream) ---- */
+  --cream: #f4f8f5;
+  --cream-soft: #e7f0e9;
+  --ink: #12181a;
+  --ink-muted: #5c6b64;
+
+  /* ---- Semantic surface colors (light) ---- */
+  --background: var(--cream);
+  --surface: var(--cream-soft);
+  --surface-elevated: #ffffff;
+  --foreground: var(--ink);
+  --muted-foreground: var(--ink-muted);
+  --border: var(--ink);
+
+  /* ---- Semantic brand roles ---- */
+  --primary: var(--signature);
+  --primary-foreground: #ffffff;
+  --accent: var(--signature-soft);
+  --accent-foreground: var(--signature-dark);
+  --success: var(--signature);
+  --danger: #c23b2c;
+
+  /* ---- Radius ---- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-full: 999px;
+
+  /* ---- Hard "sticker" shadow (offset, no blur) ---- */
+  --shadow-hard-sm: 3px 3px 0 0 var(--ink);
+  --shadow-hard: 5px 5px 0 0 var(--ink);
+  --shadow-hard-lg: 8px 8px 0 0 var(--ink);
+  --shadow-hard-signature: 5px 5px 0 0 var(--signature);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --signature: #6bbf94;
+    --signature-dark: #4c8c69;
+    --signature-soft: rgba(107, 191, 148, 0.14);
+
+    --background: #0f1613;
+    --surface: #16201b;
+    --surface-elevated: #1a251f;
+    --foreground: #f4f8f5;
+    --muted-foreground: #a3b3ac;
+    --border: #f4f8f5;
+
+    --accent: rgba(107, 191, 148, 0.16);
+    --accent-foreground: #9adcb8;
+
+    --shadow-hard-sm: 3px 3px 0 0 var(--foreground);
+    --shadow-hard: 5px 5px 0 0 var(--foreground);
+    --shadow-hard-lg: 8px 8px 0 0 var(--foreground);
+    --shadow-hard-signature: 5px 5px 0 0 var(--signature);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+
+  --color-signature: var(--signature);
+  --color-signature-dark: var(--signature-dark);
+  --color-signature-soft: var(--signature-soft);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-cream: var(--cream);
+  --color-cream-soft: var(--cream-soft);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+}
