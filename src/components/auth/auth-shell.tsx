@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Heart, ShieldCheck, Zap } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
+import { BackButton } from "@/components/shared/back-button";
 import type { ReactNode } from "react";
 
 const TRUST_POINTS = [
@@ -30,9 +31,12 @@ export function AuthShell({
           }}
         />
 
-        <Link href="/" className="relative w-fit">
-          <Logo inverted />
-        </Link>
+        <div className="relative flex items-center justify-between gap-4">
+          <Link href="/" className="w-fit">
+            <Logo inverted />
+          </Link>
+          <BackButton variant="inverted" />
+        </div>
 
         <div className="relative flex flex-col gap-6">
           <h2 className="font-display max-w-md text-4xl font-bold leading-[1.1] tracking-tight text-cream">
@@ -79,9 +83,11 @@ export function AuthShell({
       {/* form panel */}
       <div className="flex flex-col bg-cream">
         <div className="flex items-center justify-between px-5 py-6 sm:px-8 lg:hidden">
+          <BackButton />
           <Link href="/">
             <Logo />
           </Link>
+          <span className="w-18" aria-hidden="true" />
         </div>
 
         <div className="flex flex-1 items-center justify-center px-5 pb-12 sm:px-8">
