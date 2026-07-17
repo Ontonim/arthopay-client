@@ -1,0 +1,136 @@
+import type { Metadata } from "next";
+import { Link2, Lock, ShieldCheck, UserPlus, Wallet, Zap } from "lucide-react";
+import { Navbar } from "@/components/shared/navbar";
+import { Footer } from "@/components/shared/footer";
+import { PageHero } from "@/components/shared/page-hero";
+import { CtaBanner } from "@/components/home/cta-banner";
+
+export const metadata: Metadata = {
+  title: "How it works — Arthopay",
+  description:
+    "See how Arthopay helps creators set up a support page, share it with fans, and get paid instantly and securely.",
+};
+
+const STEPS = [
+  {
+    icon: UserPlus,
+    title: "Create your profile",
+    description:
+      "Sign up in minutes, add your photo, bio, and set your custom support tiers — Coffee, Tea, or a custom amount.",
+    rotate: "-rotate-2",
+  },
+  {
+    icon: Link2,
+    title: "Share your link",
+    description:
+      "Drop arthopay.com/you in your bio, videos, or stream — anywhere your fans already are.",
+    rotate: "rotate-1",
+  },
+  {
+    icon: Wallet,
+    title: "Get paid instantly",
+    description:
+      "Fans support you via SSLCommerz. Withdraw anytime, secured with PIN + OTP verification.",
+    rotate: "-rotate-1",
+  },
+];
+
+const DETAILS = [
+  {
+    icon: Zap,
+    title: "Instant payouts",
+    description:
+      "No waiting periods. Once a fan supports you, the money is yours — withdraw to your bank or mobile wallet whenever you like.",
+  },
+  {
+    icon: Lock,
+    title: "PIN + OTP protected withdrawals",
+    description:
+      "Every withdrawal request is verified with a personal PIN and a one-time code sent to your phone, so only you control your money.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Secure payments via SSLCommerz",
+    description:
+      "Fans pay through a trusted, PCI-DSS compliant gateway supporting cards, mobile banking, and local payment methods.",
+  },
+];
+
+export default function HowItWorksPage() {
+  return (
+    <div className="flex min-h-full flex-col">
+      <Navbar />
+      <main className="flex-1">
+        <PageHero
+          eyebrow="Simple by design"
+          title="Three steps to your first supporter"
+          description="No code, no setup fees — just a page your fans will love to support."
+        />
+
+        <section className="mx-auto max-w-7xl px-5 pb-20 sm:px-8 sm:pb-28">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
+            {STEPS.map((step, i) => (
+              <div
+                key={step.title}
+                className={`group relative flex flex-col items-center gap-4 rounded-2xl border-2 border-ink bg-surface-elevated p-8 text-center shadow-hard transition-transform duration-200 hover:-translate-y-1 md:items-start md:text-left ${step.rotate}`}
+              >
+                <span className="absolute -top-4 -left-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-ink bg-ink font-display text-sm font-bold text-cream">
+                  {i + 1}
+                </span>
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-ink bg-signature">
+                  <step.icon className="h-6 w-6 text-primary-foreground" strokeWidth={2.25} />
+                </div>
+                <h3 className="font-display text-lg font-bold text-foreground">
+                  {step.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {step.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-surface py-20 sm:py-28">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <span className="rotate-1 inline-block rounded-full border-2 border-ink bg-signature-soft px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-accent-foreground">
+                Behind the scenes
+              </span>
+              <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+                Built to keep your money safe
+              </h2>
+              <p className="mt-3 text-muted-foreground sm:text-lg">
+                Every payment and payout is protected, end to end.
+              </p>
+            </div>
+
+            <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-3">
+              {DETAILS.map((detail) => (
+                <div
+                  key={detail.title}
+                  className="flex flex-col gap-4 rounded-2xl border-2 border-ink bg-surface-elevated p-6 shadow-hard-sm"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-ink bg-ink">
+                    <detail.icon className="h-5.5 w-5.5 text-cream" strokeWidth={2.25} />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-bold text-foreground">
+                      {detail.title}
+                    </h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                      {detail.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <CtaBanner />
+      </main>
+      <Footer />
+    </div>
+  );
+}
