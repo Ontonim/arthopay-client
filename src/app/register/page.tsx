@@ -3,17 +3,20 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, AtSign, Mail, User } from "lucide-react";
+import { ArrowRight, AtSign, Mail, Phone, User } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthPasswordInput } from "@/components/auth/auth-password-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { GoogleButton } from "@/components/auth/google-button";
+import { ApiError } from "@/lib/api-client";
+import { registerUser } from "@/services/auth.service";
 
 interface FormState {
   name: string;
   username: string;
   email: string;
+  mobile: string;
   password: string;
 }
 
@@ -23,9 +26,11 @@ export default function RegisterPage() {
     name: "",
     username: "",
     email: "",
+    mobile: "",
     password: "",
   });
   const [errors, setErrors] = useState<Partial<FormState>>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [agreedError, setAgreedError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,6 +38,7 @@ export default function RegisterPage() {
   function handleChange(field: keyof FormState, value: string) {
     setValues((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setFormError(null);
   }
 
   function validate(): boolean {
@@ -46,6 +52,10 @@ export default function RegisterPage() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
       next.email = "Enter a valid email address";
     }
+    // Bangladeshi mobile format — adjust here if the backend expects a different pattern.
+    if (!/^01[3-9]\d{8}$/.test(values.mobile)) {
+      next.mobile = "Enter a valid mobile number, e.g. 01712345678";
+    }
     if (values.password.length < 8) {
       next.password = "Password must be at least 8 characters";
     }
@@ -54,15 +64,34 @@ export default function RegisterPage() {
     return Object.keys(next).length === 0 && agreed;
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setFormError(null);
     if (!validate()) return;
 
     setLoading(true);
-    window.setTimeout(() => {
+    try {
+      await registerUser(values);
+      // Backend requires OTP email verification before login works — send them there.
+      router.push(`/verify-email?email=${encodeURIComponent(values.email)}`);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.errorSource?.length) {
+          const fieldErrors: Partial<FormState> = {};
+          for (const e of err.errorSource) {
+            if (e.path in values) {
+              fieldErrors[e.path as keyof FormState] = e.message;
+            }
+          }
+          setErrors(fieldErrors);
+        }
+        setFormError(err.message);
+      } else {
+        setFormError("কিছু একটা ভুল হয়েছে, আবার চেষ্টা করো।");
+      }
+    } finally {
       setLoading(false);
-      router.push("/");
-    }, 900);
+    }
   }
 
   return (
@@ -89,6 +118,12 @@ export default function RegisterPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5" noValidate>
+        {formError && (
+          <p className="rounded-xl border-2 border-danger bg-danger/10 px-3.5 py-2.5 text-sm font-semibold text-danger">
+            {formError}
+          </p>
+        )}
+
         <AuthInput
           label="Full name"
           name="name"
@@ -123,6 +158,18 @@ export default function RegisterPage() {
           value={values.email}
           onChange={(e) => handleChange("email", e.target.value)}
           error={errors.email}
+        />
+
+        <AuthInput
+          label="Mobile number"
+          name="mobile"
+          type="tel"
+          autoComplete="tel"
+          placeholder="01712345678"
+          icon={<Phone className="h-4 w-4" />}
+          value={values.mobile}
+          onChange={(e) => handleChange("mobile", e.target.value.replace(/\s/g, ""))}
+          error={errors.mobile}
         />
 
         <AuthPasswordInput

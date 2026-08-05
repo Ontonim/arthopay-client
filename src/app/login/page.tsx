@@ -9,28 +9,39 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthPasswordInput } from "@/components/auth/auth-password-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { GoogleButton } from "@/components/auth/google-button";
+import { ApiError } from "@/lib/api-client";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface FormState {
-  email: string;
+  // Accepts either an email or a mobile number — the docs say login supports both.
+  identifier: string;
   password: string;
+}
+
+function isEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
 export default function LoginPage() {
   const router = useRouter();
-  const [values, setValues] = useState<FormState>({ email: "", password: "" });
+  const { login } = useAuth();
+  const [values, setValues] = useState<FormState>({ identifier: "", password: "" });
   const [errors, setErrors] = useState<Partial<FormState>>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
 
   function handleChange(field: keyof FormState, value: string) {
     setValues((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setFormError(null);
   }
 
   function validate(): boolean {
     const next: Partial<FormState> = {};
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-      next.email = "Enter a valid email address";
+    const id = values.identifier.trim();
+    if (!isEmail(id) && !/^01[3-9]\d{8}$/.test(id)) {
+      next.identifier = "Enter a valid email or mobile number";
     }
     if (values.password.length < 8) {
       next.password = "Password must be at least 8 characters";
@@ -39,15 +50,29 @@ export default function LoginPage() {
     return Object.keys(next).length === 0;
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setFormError(null);
     if (!validate()) return;
 
     setLoading(true);
-    window.setTimeout(() => {
-      setLoading(false);
+    try {
+      const id = values.identifier.trim();
+      await login(
+        isEmail(id)
+          ? { email: id, password: values.password }
+          : { mobile: id, password: values.password }
+      );
       router.push("/");
-    }, 900);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setFormError(err.message);
+      } else {
+        setFormError("কিছু একটা ভুল হয়েছে, আবার চেষ্টা করো।");
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -74,16 +99,21 @@ export default function LoginPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5" noValidate>
+        {formError && (
+          <p className="rounded-xl border-2 border-danger bg-danger/10 px-3.5 py-2.5 text-sm font-semibold text-danger">
+            {formError}
+          </p>
+        )}
+
         <AuthInput
-          label="Email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          placeholder="you@example.com"
+          label="Email or mobile number"
+          name="identifier"
+          autoComplete="username"
+          placeholder="you@example.com or 01712345678"
           icon={<Mail className="h-4 w-4" />}
-          value={values.email}
-          onChange={(e) => handleChange("email", e.target.value)}
-          error={errors.email}
+          value={values.identifier}
+          onChange={(e) => handleChange("identifier", e.target.value)}
+          error={errors.identifier}
         />
 
         <div className="flex flex-col gap-1.5">
@@ -107,7 +137,7 @@ export default function LoginPage() {
               Remember me
             </label>
             <Link
-              href="#"
+              href="/forgot-password"
               className="text-xs font-bold text-signature-dark underline decoration-2 underline-offset-2"
             >
               Forgot password?
