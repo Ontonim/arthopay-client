@@ -4,10 +4,12 @@ import { useState, type FormEvent } from "react";
 import { Loader2, Plus, X } from "lucide-react";
 import { AuthInput } from "@/components/auth/auth-input";
 import { KycTextarea } from "@/components/kyc/kyc-textarea";
-import { ApiError } from "@/lib/api-client";
 import { uploadImage } from "@/lib/upload";
-import { updateProduct } from "@/services/product.service";
-import type { Product, ProductUpdatePayload } from "@/types/product";
+import {
+  updateProductAction,
+  type Product,
+  type ProductUpdatePayload,
+} from "@/app/action/product/product.api";
 
 interface FormState {
   name: string;
@@ -23,12 +25,10 @@ interface FormState {
 
 export function ProductEditForm({
   product,
-  accessToken,
   onSaved,
   onClose,
 }: {
   product: Product;
-  accessToken: string;
   onSaved: (updated: Product) => void;
   onClose: () => void;
 }) {
@@ -125,23 +125,24 @@ export function ProductEditForm({
         images: [...values.existingImages, ...uploadedUrls],
       };
 
-      const updated = await updateProduct(product._id, payload, accessToken);
-      onSaved(updated);
-    } catch (err) {
-      if (err instanceof ApiError) {
-        if (err.errorSource?.length) {
+      // accessToken আর manually পাঠাতে হচ্ছে না — updateProductAction নিজেই cookie থেকে token পড়ে
+      const result = await updateProductAction(product._id, payload);
+      if (!result.success) {
+        if (result.errorSource?.length) {
           const fieldErrors: Partial<Record<keyof FormState, string>> = {};
-          for (const e of err.errorSource) {
+          for (const e of result.errorSource) {
             if (e.path in values) {
               fieldErrors[e.path as keyof FormState] = e.message;
             }
           }
           setErrors((prev) => ({ ...prev, ...fieldErrors }));
         }
-        setFormError(err.message);
-      } else {
-        setFormError(err instanceof Error ? err.message : "কিছু একটা ভুল হয়েছে, আবার চেষ্টা করো।");
+        setFormError(result.message);
+        return;
       }
+      onSaved(result.data);
+    } catch {
+      setFormError("কিছু একটা ভুল হয়েছে, আবার চেষ্টা করো।");
     } finally {
       setSaving(false);
     }
