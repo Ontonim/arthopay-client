@@ -9,7 +9,7 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthPasswordInput } from "@/components/auth/auth-password-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { GoogleButton } from "@/components/auth/google-button";
-import { registerAction } from "@/app/action/auth/auth.api";
+import { registerAction } from "@/app/actions/auth/auth-api";
 
 interface FormState {
   firstName: string;

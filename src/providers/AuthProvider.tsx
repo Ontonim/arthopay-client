@@ -14,7 +14,7 @@ import {
   refreshTokenAction,
   type LoginPayload,
   type LoginResponseData,
-} from "@/app/action/auth/auth.api";
+} from "@/app/actions/auth/auth-api";
 
 /**
  * ⚠️ Backend gap: doc-এ কোনো "get current user" endpoint নেই। Login response-এর
