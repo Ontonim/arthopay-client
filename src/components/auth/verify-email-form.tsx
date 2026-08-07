@@ -7,7 +7,7 @@ import { ArrowRight, KeyRound, Mail } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
-import { resendOtpAction, verifyEmailAction } from "@/app/action/auth/auth.api";
+import { resendOtpAction, verifyEmailAction } from "@/app/actions/auth/auth-api";
 
 const RESEND_COOLDOWN_SECONDS = 60; // doc: resend-otp rate limit ৬০ সেকেন্ড
 
