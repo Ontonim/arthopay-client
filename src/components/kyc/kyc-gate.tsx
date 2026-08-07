@@ -147,9 +147,9 @@ function FullScreenShell({
   wide?: boolean;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-ink/60 p-4 py-10 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 backdrop-blur-sm">
       <div
-        className={`flex w-full flex-col items-center gap-4 rounded-3xl border-2 border-ink bg-surface-elevated p-8 shadow-hard-lg ${
+        className={`flex max-h-[90vh] w-full flex-col items-center gap-4 overflow-y-auto rounded-3xl border-2 border-ink bg-surface-elevated p-6 shadow-hard-lg sm:p-8 ${
           wide ? "max-w-2xl" : "max-w-md"
         }`}
       >
