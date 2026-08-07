@@ -3,9 +3,12 @@
 import { createHash } from "crypto";
 
 /**
- * NID front/back Cloudinary-তে সরাসরি (browser → Cloudinary) আপলোড হয় — আমাদের
- * server-এ ফাইল আসে না, শুধু এই signature দিয়ে সেই আপলোডটা authorize করি।
- * তাই CLOUDINARY_API_SECRET কখনো client-এ যায় না, এই function-এর ভিতরেই থাকে।
+ * NID front/back Cloudinary-তে সরাসরি (browser → Cloudinary) আপলোড হয়।
+ *
+ * ⚠️ Signature algorithm: Cloudinary account-ভেদে SHA-1 বা SHA-256 হতে পারে
+ * (নতুন account-এ ডিফল্ট SHA-256)। Cloudinary Console → Settings → Security →
+ * "Signature algorithm" দেখে .env.local-এ CLOUDINARY_SIGNATURE_ALGORITHM
+ * বসাও — না দিলে sha1 ধরে নেওয়া হবে।
  */
 
 export interface CloudinarySignatureData {
@@ -20,6 +23,9 @@ export async function getCloudinarySignatureAction(): Promise<CloudinarySignatur
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const algorithm = (process.env.CLOUDINARY_SIGNATURE_ALGORITHM || "sha1") as
+    | "sha1"
+    | "sha256";
 
   if (!cloudName || !apiKey || !apiSecret) {
     throw new Error(
@@ -31,9 +37,9 @@ export async function getCloudinarySignatureAction(): Promise<CloudinarySignatur
   const folder = "arthopay/kyc-nid";
 
   // Cloudinary rule: sign করার প্যারামিটারগুলো alphabetically sort করে
-  // key=value&key=value... বানিয়ে শেষে api_secret জোড়া দিয়ে SHA-1 নিতে হয়।
+  // key=value&key=value... বানিয়ে শেষে api_secret জোড়া দিয়ে hash নিতে হয়।
   const paramsToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
-  const signature = createHash("sha1").update(paramsToSign).digest("hex");
+  const signature = createHash(algorithm).update(paramsToSign).digest("hex");
 
   return { timestamp, signature, apiKey, cloudName, folder };
 }

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { KycGate } from "@/components/kyc/kyc-gate";
+import { SellerDashboard } from "@/components/dashboard/SellerDashboard";
+import { UserDashboard } from "@/components/dashboard/UserDashboard";
 
 export default function DashboardPage() {
   const { user, isInitializing, isAuthenticated } = useAuth();
@@ -24,21 +26,27 @@ export default function DashboardPage() {
     );
   }
 
+  // Guard: user should exist when authenticated, but we handle null gracefully
+  if (!user) {
+    // Redirect or show an error – here we show a friendly message
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-background">
+        <p className="text-sm font-semibold text-danger">
+          User data not available. Please log in again.
+        </p>
+      </div>
+    );
+  }
+
+  const role = user.role === "SELLER" ? "seller" : "user";
+
   return (
     <KycGate>
-      <div className="mx-auto flex min-h-svh w-full max-w-5xl flex-col gap-6 px-5 py-10 sm:px-8">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">
-            স্বাগতম, {user?.firstName} 👋
-          </h1>
-          <p className="text-sm font-semibold text-muted-foreground">
-            তোমার business verified — dashboard এখন খোলা।
-          </p>
-        </div>
-
-        {/* Admin phase বসানোর পরে এখানে products/orders/payments-এর মতো
-            requireKyc-locked module গুলো যোগ হবে। */}
-      </div>
+      {role === "seller" ? (
+        <SellerDashboard user={user} />
+      ) : (
+        <UserDashboard user={user} />
+      )}
     </KycGate>
   );
 }

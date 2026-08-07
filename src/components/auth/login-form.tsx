@@ -12,7 +12,6 @@ import { GoogleButton } from "@/components/auth/google-button";
 import { useAuth } from "@/providers/AuthProvider";
 
 interface FormState {
-  // doc: emailOrPhone — email বা mobile, দুটোই একই field দিয়ে যায়, backend @ দেখে বুঝে নেয়
   emailOrPhone: string;
   password: string;
 }
@@ -60,9 +59,14 @@ export function LoginForm() {
         emailOrPhone: values.emailOrPhone.trim(),
         password: values.password,
       });
-      router.push("/");
+      // Redirect to dashboard instead of home page
+      router.push("/dashboard");
+      // Bust any cached auth state so the dashboard reflects the new session
+      router.refresh();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "কিছু একটা ভুল হয়েছে, আবার চেষ্টা করো।");
+      setFormError(
+        err instanceof Error ? err.message : "Something went wrong, please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -155,4 +159,4 @@ export function LoginForm() {
       </form>
     </AuthShell>
   );
-}   
+}
