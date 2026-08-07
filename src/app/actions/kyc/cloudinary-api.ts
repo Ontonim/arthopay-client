@@ -3,13 +3,25 @@
 import { createHash } from "crypto";
 
 /**
- * NID front/back Cloudinary-তে সরাসরি (browser → Cloudinary) আপলোড হয়।
+ * NID front/back, business logo, cover image — সবই Cloudinary-তে সরাসরি
+ * (browser → Cloudinary) আপলোড হয়। কোন ধরনের image সেটা অনুযায়ী আলাদা
+ * folder-এ রাখা হয় (KYC_UPLOAD_FOLDERS দ্রষ্টব্য) — folder নির্বাচন সবসময়
+ * server-side এ হয়, client থেকে arbitrary folder পাঠানো যায় না।
  *
  * ⚠️ Signature algorithm: Cloudinary account-ভেদে SHA-1 বা SHA-256 হতে পারে
  * (নতুন account-এ ডিফল্ট SHA-256)। Cloudinary Console → Settings → Security →
  * "Signature algorithm" দেখে .env.local-এ CLOUDINARY_SIGNATURE_ALGORITHM
  * বসাও — না দিলে sha1 ধরে নেওয়া হবে।
  */
+
+export type KycUploadKind = "nid-front" | "nid-back" | "business-logo" | "cover-image";
+
+const KYC_UPLOAD_FOLDERS: Record<KycUploadKind, string> = {
+  "nid-front": "arthopay/kyc-nid",
+  "nid-back": "arthopay/kyc-nid",
+  "business-logo": "arthopay/kyc-branding",
+  "cover-image": "arthopay/kyc-branding",
+};
 
 export interface CloudinarySignatureData {
   timestamp: number;
@@ -19,7 +31,9 @@ export interface CloudinarySignatureData {
   folder: string;
 }
 
-export async function getCloudinarySignatureAction(): Promise<CloudinarySignatureData> {
+export async function getCloudinarySignatureAction(
+  kind: KycUploadKind = "nid-front"
+): Promise<CloudinarySignatureData> {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
@@ -34,7 +48,7 @@ export async function getCloudinarySignatureAction(): Promise<CloudinarySignatur
   }
 
   const timestamp = Math.floor(Date.now() / 1000);
-  const folder = "arthopay/kyc-nid";
+  const folder = KYC_UPLOAD_FOLDERS[kind];
 
   // Cloudinary rule: sign করার প্যারামিটারগুলো alphabetically sort করে
   // key=value&key=value... বানিয়ে শেষে api_secret জোড়া দিয়ে hash নিতে হয়।

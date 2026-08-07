@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Building2, Mail, Phone, MapPin, Image as ImageIcon, Globe, Check, ArrowLeft, ArrowRight } from "lucide-react";
+import { Building2, Mail, Phone, MapPin, Globe, Check, ArrowLeft, ArrowRight } from "lucide-react";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { NidUploadInput } from "@/components/kyc/nid-upload-input";
+import { BrandingUploadInput } from "@/components/kyc/branding-upload-input";
 import { submitKycAction, type SubmitKycPayload } from "@/app/actions/kyc/kyc-api";
 import { cn } from "@/lib/utils";
 
@@ -303,22 +304,18 @@ export function KycForm({ onSubmitted }: { onSubmitted: () => void }) {
       {/* Step 2 – Branding */}
       <section className={cn("flex flex-col gap-4", step !== 1 && "hidden")}>
         <h3 className="font-display text-lg font-bold text-foreground">2. Branding</h3>
-        <AuthInput
-          label="Business logo URL"
-          name="businessLogo"
-          placeholder="https://cdn.example.com/logo.jpg"
-          icon={<ImageIcon className="h-4 w-4" />}
+        <BrandingUploadInput
+          label="Business logo"
+          kind="business-logo"
           value={values.businessLogo}
-          onChange={(e) => set("businessLogo", e.target.value)}
+          onChange={(url) => set("businessLogo", url)}
           error={errors.businessLogo}
         />
-        <AuthInput
-          label="Cover image URL"
-          name="coverImage"
-          placeholder="https://cdn.example.com/cover.jpg"
-          icon={<ImageIcon className="h-4 w-4" />}
+        <BrandingUploadInput
+          label="Cover image"
+          kind="cover-image"
           value={values.coverImage}
-          onChange={(e) => set("coverImage", e.target.value)}
+          onChange={(url) => set("coverImage", url)}
           error={errors.coverImage}
         />
       </section>
