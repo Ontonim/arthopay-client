@@ -3,7 +3,7 @@ import { getCloudinarySignatureAction, type KycUploadKind } from "@/app/actions/
 /**
  * File নিয়ে সরাসরি Cloudinary-তে POST করে, আমাদের server bandwidth-এ কোনো
  * ভার পড়ে না — শুধু signature নিতে একবার server action কল হয়। `kind`
- * অনুযায়ী server-side ঠিক করে দেয় কোন folder-এ upload হবে (nid vs branding)।
+ * অনুযায়ী server-side ঠিক করে দেয় কোন folder-এ upload হবে (nid vs branding vs product)।
  */
 export async function uploadKycImage(file: File, kind: KycUploadKind): Promise<string> {
   const { timestamp, signature, apiKey, cloudName, folder } =
