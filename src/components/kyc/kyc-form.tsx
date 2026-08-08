@@ -8,6 +8,7 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { NidUploadInput } from "@/components/kyc/nid-upload-input";
 import { BrandingUploadInput } from "@/components/kyc/branding-upload-input";
+import { ProductImagesUploadInput } from "@/components/kyc/product-images-upload-input";
 import { submitKycAction, type SubmitKycPayload } from "@/app/actions/kyc/kyc-api";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ interface FormState {
   facebookPageUrl: string;
   instagram: string;
   website: string;
+  productImages: string[];
   nidFront: string;
   nidBack: string;
 }
@@ -41,6 +43,7 @@ const INITIAL: FormState = {
   facebookPageUrl: "",
   instagram: "",
   website: "",
+  productImages: [],
   nidFront: "",
   nidBack: "",
 };
@@ -61,6 +64,7 @@ const STEPS = [
   { title: "Business info", fields: ["businessName", "businessUsername", "businessEmail", "phoneNumber", "businessAddress", "bio"] },
   { title: "Branding", fields: ["businessLogo", "coverImage"] },
   { title: "Social", fields: ["facebookPageUrl", "instagram", "website"] },
+  { title: "Products", fields: ["productImages"] },
   { title: "Identity (NID)", fields: ["nidFront", "nidBack"] },
 ] as const satisfies readonly { title: string; fields: readonly (keyof FormState)[] }[];
 
@@ -118,6 +122,12 @@ export function KycForm({ onSubmitted }: { onSubmitted: () => void }) {
         return values.instagram && !isValidUrl(values.instagram) ? "Enter a valid URL" : undefined;
       case "website":
         return values.website && !isValidUrl(values.website) ? "Enter a valid URL" : undefined;
+      case "productImages":
+        return values.productImages.length < 3
+          ? "Upload at least 3 product images"
+          : values.productImages.length > 5
+            ? "Maximum 5 product images"
+            : undefined;
       case "nidFront":
         return !values.nidFront ? "Upload NID front image" : undefined;
       case "nidBack":
@@ -193,10 +203,7 @@ export function KycForm({ onSubmitted }: { onSubmitted: () => void }) {
         facebookPageUrl: values.facebookPageUrl.trim(),
         instagram: values.instagram.trim() || undefined,
         website: values.website.trim() || undefined,
-        // ⚠️ productImages will be handled separately in the "product upload" feature.
-        // Currently sending an empty array – backend expects 3–5 URLs, so this may
-        // return a 400 until that feature is integrated.
-        productImages: [],
+        productImages: values.productImages,
         nidFront: values.nidFront,
         nidBack: values.nidBack,
         confirmed: true,
@@ -352,9 +359,22 @@ export function KycForm({ onSubmitted }: { onSubmitted: () => void }) {
         />
       </section>
 
-      {/* Step 4 – Identity (NID) – uploaded directly to Cloudinary */}
+      {/* Step 4 – Products – uploaded directly to Cloudinary */}
       <section className={cn("flex flex-col gap-4", step !== 3 && "hidden")}>
-        <h3 className="font-display text-lg font-bold text-foreground">4. Identity (NID)</h3>
+        <h3 className="font-display text-lg font-bold text-foreground">4. Products</h3>
+        <ProductImagesUploadInput
+          label="Product images"
+          value={values.productImages}
+          onChange={(urls) => set("productImages", urls)}
+          error={errors.productImages}
+          min={3}
+          max={5}
+        />
+      </section>
+
+      {/* Step 5 – Identity (NID) – uploaded directly to Cloudinary */}
+      <section className={cn("flex flex-col gap-4", step !== 4 && "hidden")}>
+        <h3 className="font-display text-lg font-bold text-foreground">5. Identity (NID)</h3>
         <NidUploadInput
           label="NID front"
           value={values.nidFront}
